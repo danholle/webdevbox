@@ -1,0 +1,49 @@
+#!/bin/bash
+
+############################################################
+#
+# Install Tomcat web server and make it autostart on reboot
+#
+# Example:  tomcat/install 8080
+# Installs tomcat, listening on port 8080.
+#
+############################################################
+
+echo " "
+ok=1
+if [ "$#" -eq 1 ]
+then
+  port=$1
+  case $port in 
+    *[!0-9]*)  ok=0 ;;
+    *)         ok=1 ;;
+  esac
+fi
+
+if [ "$ok" == "1" ]
+then
+  sudo cp tomcat/tomcat.service /etc/systemd/system/tomcat.service
+  sudo groupadd tomcat
+  sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+  cd /tmp
+  curl -O http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.0.47/bin/apache-tomcat-8.0.47.tar.gz
+  sudo mkdir /opt/tomcat
+  sudo tar xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1
+  cd /opt/tomcat
+  sudo sed -i 's/8080/$port/g' server.xml
+  sudo chgrp -R tomcat /opt/tomcat
+  sudo chmod -R g+r conf
+  sudo chmod g+x conf
+  sudo chown -R tomcat webapps/ work/ temp/ logs/
+  sudo systemctl daemon-reload
+  sudo systemctl enable tomcat
+else
+  echo " "
+  echo "I did not install Tomcat because I was expecting a numeric"
+  echo "port number to be specified.  Example:"
+  echo " "
+  echo "   tomcat/install 8080"
+  echo " "
+fi
+
+
