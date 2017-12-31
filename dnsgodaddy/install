@@ -1,22 +1,38 @@
 #!/bin/bash
+echo " "
+echo "-----------------------------"
+echo "Getting some prerequisites..."
 sudo systemctl stop dnsupdater
 pip3 install godaddypy pif
 
+echo " "
+echo "-----------------------------"
+echo "Writing the DNS updater..."
 cp dnsgodaddy/template.py dnsgodaddy/dnsupdater.py
 sed -i "s/GODADDYDOMAIN/$1/g" dnsgodaddy/dnsupdater.py
 sed -i "s/GODADDYPUBLICKEY/$2/g" dnsgodaddy/dnsupdater.py
 sed -i "s/GODADDYPRIVATEKEY/$3/g" dnsgodaddy/dnsupdater.py
 sudo cp dnsgodaddy/dnsupdater.py /usr/local/bin/dnsupdater.py
+rm dnsgodaddy/dnsupdater.py
 
+echo " "
+echo "-----------------------------"
+echo "Writing your initial index.html..."
 cp dnsgodaddy/template.html dnsgodaddy/index.html
 sed -i "s/GODADDYDOMAIN/$1/g" dnsgodaddy/index.html
 sudo cp dnsgodaddy/index.html /var/www/html/index.html
+rm dnsgodaddy/index.html
 
+echo " "
+echo "-----------------------------"
+echo "Setting up DNS updater log file..."
 echo "Installed GoDaddy dnsupdater." >> dnsupdater.log
 sudo mv dnsupdater.log /usr/local/bin/dnsupdater.log
 sudo chmod a+rw /usr/local/bin/dnsupdater.log
-#rm dnsgodaddy/dnsupdater.py
 
+echo " "
+echo "-----------------------------"
+echo "Installing, enabling, and staring the DNS Updater..."
 sudo cp dnsgodaddy/dnsupdater.service /etc/systemd/system/dnsupdater.service
 sudo chmod 644 /etc/systemd/system/dnsupdater.service
 sudo systemctl daemon-reload
