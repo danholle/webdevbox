@@ -8,32 +8,51 @@
  
 sudo apt-get update
 
+echo " "
+echo "-------------------------"
 echo "Installing stuff that I kind of assumed was there.  Assume no more!"
 sudo apt-get install -y vim git curl wget openssh-server ufw
 
+echo " "
+echo "-------------------------"
 echo "Installing c, c++, java 1.8, python3 dev"
 sudo apt-get install -y build-essential openjdk-8-jdk python3-dev 
 
+echo " "
+echo "-------------------------"
 echo "Installing dev tools pip, maven"
-sudo apt-get install python3-pip maven
+sudo apt-get install -y python3-pip maven
 sudo -H pip3 install --upgrade pip
 
+echo " "
+echo "-------------------------"
 echo "Setting the firewall to allow ssh, http, https traffic" 
 sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw enable
 
-echo "Installing pristine nginx (reverse proxy)"
+echo " "
+echo "-------------------------"
+echo "Installing nginx (reverse proxy)"
 sudo systemctl stop nginx 
-sudo apt-get purge nginx
-sudo apt-get clean
-sudo apt-get install -y nginx
+sudo apt-get -y purge nginx nginx-common
+sudo apt-get -y autoremove
+sudo rm -rf /etc/nginx
+sudo apt-get -y install nginx
+sudo systemctl stop nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+echo " "
+echo "----------------"
+echo "You should be able to go to http://localhost with your browser and"
+echo "see the nginx welcome page."
+echo " "
 
-echo "Installing certbot (for creating certificates)"
-sudo add-apt-repository ppa:certbot/certbot
-sudo apt-get update
-sudo apt-get install python-certbot-nginx
+#echo "Installing certbot (for creating certificates)"
+#sudo add-apt-repository ppa:certbot/certbot
+#sudo apt-get update
+#sudo apt-get install python-certbot-nginx
 
 
 

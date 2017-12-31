@@ -6,9 +6,9 @@ import time
 import logging
 
 # GoDaddy domain & authentication
-domain="GODADDYDOMAIN"
-publickey="GODADDYPUBLICKEY"
-privatekey="GODADDYPRIVATEKEY"
+domain="perrysfield.com"
+publickey="9jdic1YuP4c_GmhjY56SeFyV4pz382M7mb"
+privatekey="GmhmcqxY7e3KPTe7izKqHb"
 
 logging.basicConfig(filename="dnsupdater.log",filemode='a',
     level=logging.INFO, format='%(asctime)s: %(message)s',

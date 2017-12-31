@@ -1,9 +1,6 @@
 WARNING:  This is not quite ready to consume!  Published because I'm testing.
 
-# ***webdevbox:***
-
-# **Ubuntu Setup Scripts for a**
-# **Web Application Development Server**
+<h1><b><i>webdevbox:</i><br/>Setup Scripts for a Web Application Development Server</b></h1>
 
 *Compilers, Tomcat, nginx, node.js, Jenkins, etc.*
 
@@ -16,27 +13,35 @@ something the same or similar, great.
 There's nothing profound or innovative here.  It's just that 
 it took a bit of hacking to get these parts to play nicely...
 time that hopefully I can save for you.
+I've made it easy for you to grab the scripts, and help walk
+you through the process so you can modify the steps to suit
+your needs along the way.
+
+This stuff assumes you have an Ubuntu server up and running,
+with an internet connection and command-line access to the
+box... either through Terminal or via SSH.
 
 --------
 
-My objectives for this web development box:
- *  I wanted an environment where I could develop and test
+At the end of this exercise, you will have
+ *  An environment where you could develop and test
     web applications, and make them available on the 
     public internet
  *  Web content might be static HTML, or Java servlet / JSP,
-    or node.js
- *  I'm planning to add a Continuous Integration setup
+    or node.js;  they all appear as one site from the Web
+ *  COMING SOON:  I'm planning to add a CI/CD setup
     using Jenkins (also accessible remotely)
  *  Since the above can be challenging to make secure on
-    the public internet, front-end this stuff with a
+    the public internet, the above is front-ended with a
     (reverse) proxy which only exposes what I want to
-    expose, without limiting the server-local environment
- *  All remote access is via https (encrypted)
+    expose, without limiting the server-local dev environment
+ *  All remote (public internet) access is certified
+    and encrypted (no changes required for your web content)
 
 --------
 
-I'm assuming you are installing on an Ubuntu machine.  We will
-get the scripts onto your machine by pulling them from git;
+Let's get started.  We will
+get my scripts onto your machine by pulling them from git;
 we will view / modify them with vim.  Everything here can be 
 done on an ssh connection, and each step will be described in
 TL;DR detail so don't get stressed just yet.
@@ -57,34 +62,23 @@ You'll see this README and a set of directories, one for
 each of the following steps, which I'm assuming you will
 carry out in the following order:
 
-1.  [base](base/README.md) 
+1.  [base](base/README.md) installs some common prerequisites.
+    If you click on the link, it will take you to the TL;DR
+    description of this step.
+2.  [dnsgodaddy](dnsgodaddy/README.md) sets up the web proxy
+    if you are coming in via a GoDaddy domain.  In the 
+    process we set up a (free) certificate to certify your
+    site as legit.  Or, if you don't like GoDaddy,
+3.  [dnsselfsigned](dnsselfsigned/README.md) is an alternative
+    to the above if you want to set up forwarding using No-IP
+    and a self-signed certificate.  Your site will still be 
+    secure and encrypted, but users may get some
+    scary messages upon their first visit.
+4.  [tomcat](tomcat/README.md) installs the Tomcat web server
+    (servlet container) as a service which will start 
+    whenever your machine restarts.
 
-    
-
-
-
-
-
-These scripts are for setting up an Ubuntu development server
-for building web applications.   Components installed include
- *  *basebox:*  Compilers and stuff
- *  *tomcat:*  Tomcat servlet container, along with a Hello World servlet
- *  *nodejs:*  Sets up node.js and associated tools
- *  *nginx:*  Sets up nginx as a reverse proxy in front of static HTML, Tomcat, and node.js with SSL and all that stuff.
-
- 
- 
-
-## Installing Tomcat
-
-blah blah
-
-   tomcat/install 8080
-
-blah blah
-
-
-
-
+That should do it for now.  Good luck... and may the Force
+be with you!
 
 
