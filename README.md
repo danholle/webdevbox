@@ -25,18 +25,13 @@ box... either through Terminal or via SSH.
 
 At the end of this exercise, you will have
  *  An environment where you could develop and test
-    web applications, and make them available on the 
-    public internet
- *  Web content might be static HTML, or Java servlet / JSP,
-    or node.js;  they all appear as one site from the Web
+    web content, be it in the form of HTML5, Java 
+    servlets / JSP, node.js apps, etc.
+ *  A platform which can present such content securely
+    on the public Internet, through a gateway server
+    (reverse proxy) which acts as gatekeeper 
  *  COMING SOON:  I'm planning to add a CI/CD setup
     using Jenkins (also accessible remotely)
- *  Since the above can be challenging to make secure on
-    the public internet, the above is front-ended with a
-    (reverse) proxy which only exposes what I want to
-    expose, without limiting the server-local dev environment
- *  All remote (public internet) access is certified
-    and encrypted (no changes required for your web content)
 
 --------
 
