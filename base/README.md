@@ -79,10 +79,11 @@ The steps to set port forwarding on a BT Home Hub 5 are as follows:
  3.  Now let's go create a forwarding rule.  Click "Manage games
      and applications".
  4.  Call your rule "httphttps".  Set up the following ports:
-               Ports:  Map To:
-         TCP   22-22   22-22      This forwards your SSH traffic
-         TCP   80-80   80-80      This forwards your HTTP traffic
-         TCP   443-443 443-443    This forwards your HTTPS traffic
+     | Protocol | Port Range | Transfer To | Description |
+     |------|----------|-------------|-------------|
+     | TCP  | 22 - 22    | 22 - 22       | This forwards your SSH traffic |
+     | TCP  | 80 - 80    | 80 - 80       | This forwards your HTTP traffic |
+     | TCP  | 443 - 443  | 443 - 443     | This forwards your HTTPS traffic |
      Click apply.
  5.  Click Return to Port Forwarding.
  6.  Under "Select game or application", choose "httphttps".  Under 

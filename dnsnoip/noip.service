@@ -1,0 +1,10 @@
+[Unit]
+Description=No-ip.com dynamic IP address updater
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart=/usr/local/bin/noip2
+Restart=always
+

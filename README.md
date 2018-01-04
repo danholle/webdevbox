@@ -29,13 +29,16 @@ At the end of this exercise, you will have
     servlets / JSP, node.js apps, etc.
  *  A platform which can present such content securely
     on the public Internet, through a gateway server
-    (reverse proxy) which acts as gatekeeper 
+    (reverse proxy) which acts as a secure gatekeeper
+ *  Your public internet location is either a domain
+    you own, or a dynamic DNS location you've set up.
+    We'll set up DNS updating for your home network. 
  *  COMING SOON:  I'm planning to add a CI/CD setup
     using Jenkins (also accessible remotely)
 
 --------
 
-Let's get started.  We will
+Let's get started.  To keep things simple, we will 
 get my scripts onto your machine by pulling them from git;
 we will view / modify them with vim.  Everything here can be 
 done on an ssh connection, and each step will be described in
@@ -57,13 +60,17 @@ You'll see this README and a set of directories, one for
 each of the following steps, which I'm assuming you will
 carry out in the following order:
 
-1.  [base](base/README.md) installs some common prerequisites.
-    If you click on the link, it will take you to the TL;DR
-    description of this step.
-2.  [dnsgodaddy](dnsgodaddy/README.md) sets up the web proxy
-    if you are coming in via a GoDaddy domain.  In the 
-    process we set up a (free) certificate to certify your
-    site as legit.  Or, if you don't like GoDaddy,
+1.  [base](base/README.md) installs compilers, build tools,
+    our gatekeeper/proxy (nginx), and some common prerequisites.
+    When this is done, you will be able to hit a static "hello 
+    world" HTML5 page from the public internet.  (If you click 
+    the *base* link, it will take you to the TL;DR
+    description of this step.)
+2.  [dnsgodaddy](dnsgodaddy/README.md) is used to connect your
+    webdevbox to a GoDaddy domain you own.  DNS updating will
+    be set up to keep this domain pointed at your webdevbox.
+    Once this is done, you'll be able to get at that same
+    "Hello World" page via your domain from anywhere.
 3.  [dnsselfsigned](dnsselfsigned/README.md) is an alternative
     to the above if you want to set up forwarding using No-IP
     and a self-signed certificate.  Your site will still be 

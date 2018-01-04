@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Used to blow away certbot so we can test install 
+# in a semi-pristine environment.
+
+echo " "
+echo "Blowing away certbot/letsencrypt."
+#sudo systemctl stop nginx 
+sudo apt-get -y purge python-certbot-nginx
+sudo apt-get -y autoremove
+sudo apt-get -y clean
+sudo rm -rf /etc/letsencrypt
+sudo rm -rf /var/lib/letsencrypt
+sudo rm -rf /var/log/letsencrypt
+
