@@ -1,9 +1,5 @@
-<p style="font-size: large; font-weight: bold; font-style: italic">
-  webdevbox/commonbase:
-</p>
-<p style="font-size: x-large; font-weight: bold">
-  Setting Up a Common Base of Compilers, Tools, and Libraries
-</p>
+## ***webdevbox/commonbase:***
+# **Setting Up a Common Base of Compilers, Tools, and Libraries**
 
 --------
 
