@@ -12,8 +12,8 @@ privatekey="GODADDYPRIVATEKEY"
 
 logging.basicConfig(filename="dnsupdater.log",filemode='a',
     level=logging.INFO, format='%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d %I:%M/%S %p')
-logging.info("Updating IP address for "+domain+" on GoDaddy.")
+    datefmt='%Y/%m/%d %H:%M:%S')
+logging.info("dnsupdater:  Updating IP address for "+domain+" on GoDaddy.")
 acct=godaddypy.Account(api_key=publickey,api_secret=privatekey)
 previp="none"
 passno=0
@@ -26,12 +26,14 @@ while True:
   currip=pif.get_public_ip()
   if (previp!=currip):
     if (previp=="none"):
-      print("Initial IP address is "+currip+".")
+      logging.info("Initial IP address is "+currip+".")
     else:
-      print("IP changed from "+previp+" to "+currip+".")
+      logging.info("IP changed from "+previp+" to "+currip+".")
     client=godaddypy.Client(acct)
     logging.info("Logged into godaddy.")
     client.update_ip(currip,domains=[domain])
     logging.info("Set the address for "+domain+" to "+currip+".")
     previp=currip
     client=None
+  # end if changed IP
+# end while

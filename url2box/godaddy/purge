@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo " "
+echo "Blowing away GoDaddy DNS updater."
+
+systemctl is-active dnsupdater >/dev/null 2>&1 && sudo systemctl stop dnsupdater
+sudo systemctl disable dnsupdater
+sudo rm -f /etc/systemd/system/dnsupdater.service
+sudo systemctl daemon-reload
+sudo rm -f /var/www/html/webdevbox.html
+sudo rm -f /usr/local/bin/dnsupdater*
+echo " "
+echo "GoDaddy DNS updater is history."
+echo " "
+

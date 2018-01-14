@@ -1,0 +1,75 @@
+#!/bin/bash
+echo " "
+
+# Check to see if it's already installed
+if [ -d /etc/letsencrypt ] | [ -f /etc/nginx/sites-available/precertify.conf ] | [ -f /etc/nginx/sites-available/certified.conf ]
+then
+  echo "It looks like certify/install has already been run.  If you want"
+  echo "to remove what's there and clean re-install, use these commands:"
+  echo " "
+  echo "    certify/purge"
+  echo "    certify/install $1 "
+  echo " "
+  exit 1
+fi
+
+# check prerequisites
+if [ ! -d /etc/nginx ] | [ ! -f /etc/nginx/sites-available/gateway ]
+then 
+  echo "You need to do 'gateway/install' before you can certify."
+  echo " "
+  exit 1
+fi
+
+# check parameters ... there should be 0
+if [ "$#" -ne 1 ]
+then
+  echo "WTF?!?  I wasn't expecting parameters.  Just say "
+  echo " "
+  echo "    gateway/install"
+  echo " "
+  exit 1
+fi
+
+# Create a new nginx config for certbot challenge
+# Like gateway, but server_name is our public URL
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/precertify
+sudo sed -i "s/server_name _/server_name $1/g" /etc/nginx/sites-available/precertify
+sudo cp /etc/nginx/sites-available/precertify /etc/nginx/sites-available/default
+sudo systemctl reload nginx
+
+echo " "
+echo "Installing certbot for nginx..."
+sudo apt-get install -y python-certbot-nginx
+
+echo " "
+echo "Generating certificates.  Right answer is 1."
+#sudo ufw disable
+#sudo certbot --nginx -d $1
+sudo certbot --authenticator webroot --webroot-path /var/www/html --installer nginx -d $1 
+#exit
+
+# Grab nginx config as doctored by certbot.
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/postcertify
+
+# Install the nginx config we want to run with
+sudo cp certify/certified /etc/nginx/sites-available/certified
+
+tomcatport=8080
+[ -f tomcat/setport ] && source tomcat/setport
+
+# Fill in the substitutions in our new nginx config
+sudo sed -i "s/TOMCATPORT/$tomcatport/g" /etc/nginx/sites-available/certified
+sudo sed -i "s/WEBDEVDOMAINNAME/$1/g" /etc/nginx/sites-available/certified
+sudo sed -i "s/server_name _/server_name $1/g" /etc/nginx/sites-available/certified
+sudo cp /etc/nginx/sites-available/certified /etc/nginx/sites-available/default
+sudo systemctl reload nginx
+
+sudo systemctl reload nginx
+
+echo " "
+echo "You are now set to use $1 to securely access your webdevbox from the public internet."
+echo "All traffic encrypted.  $1/docs redirects to localhost:$tomcatport/docs;  anything else will"
+echo "serve static content from /var/www/html.  To change this behaviour, edit nginx config"
+echo "/etc/nginx/sites-available/default which has embedded hints for you..."
+

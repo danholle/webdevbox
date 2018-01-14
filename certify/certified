@@ -1,0 +1,59 @@
+# This first server block simply forces everything to HTTPS.
+server {
+  listen 80;
+  return 302 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/WEBDEVDOMAINNAME/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/WEBDEVDOMAINNAME/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+  server_name _;
+
+  access_log /var/log/nginx/access.log;
+
+  # This location block is an example of how to route requests
+  # to Tomcat.  The location line picks off anything going to
+  # paths /docs and /manager/html and pushes them to Tomcat
+  # (i.e. localhost:8080).  Note that you can choose here which
+  # paths you want visible on the public internet, and only include
+  # those.  If you want to change this list, edit file
+  #  
+  #   /etc/nginx/sites-available/default 
+  # 
+  # then check your typing by asking nginx to look it over:
+  #  
+  #   sudo nginx -t
+  #
+  # When it looks good, you can tell nginx to pick up the new rules
+  #
+  #   sudo systemctl reload nginx
+  # 
+  location ~ (/docs|/manager/html) {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Fix the “It appears that your reverse proxy set up is broken" error.
+    proxy_pass          http://localhost:TOMCATPORT;
+    proxy_read_timeout  90;
+
+    proxy_redirect      http://localhost:TOMCATPORT https://$host;
+  }
+
+  # nginx will use the longest matching string to select a 
+  # location block;  so this one effectively defaults all
+  # paths not yet selected to go to the static HTML 
+  # directory /var/www/html.
+  location / {
+    root /var/www/html;
+    index index.html webdevbox.html;
+    try_files $uri $uri/ =404;
+  }
+
+}
+

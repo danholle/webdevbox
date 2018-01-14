@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#############################
+#                           
+#  Base setup for Webapp Development Box  
+#
+#############################
+
+echo " "
+echo "In preparation for installs, update repositories..." 
+sudo add-apt-repository -y ppa:certbot/certbot
+sudo apt-get -y update
+sudo apt-get -y upgrade
+
+echo " "
+echo "In case they're not there... install vim, git, curl, wget, openssh, ufw..."
+sudo apt-get install -y vim git curl wget openssh-server ufw
+
+echo " "
+echo "Installing c, c++, java 1.8, python3 dev"
+sudo apt-get install -y build-essential openjdk-8-jdk python3-dev 
+
+echo " "
+echo "Installing dev tools pip, maven"
+sudo apt-get install -y python3-pip maven
+sudo -H pip3 install --upgrade pip
+pip3 install -q godaddypy pif
+
+echo " "
+echo "Compilers, tools, ssh, and firewall stuff have been installed."
+echo " "
+

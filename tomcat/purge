@@ -1,0 +1,38 @@
+#!/bin/bash
+
+############################################################
+#
+# Remove Tomcat web server installed by 'install' script
+#
+############################################################
+
+echo " "
+if [ "$#" -eq 0 ]
+then
+  rm -f tomcat/setport
+
+  if [ -f "/etc/systemd/system/tomcat.service" ]
+  then
+    systemctl is-active tomcat >/dev/null 2>&1 && sudo systemctl stop tomcat
+    sudo systemctl disable tomcat
+    sudo rm /etc/systemd/system/tomcat.service
+    sudo systemctl daemon-reload
+    sudo userdel tomcat
+
+    echo "Tomcat systemd service removed."
+    echo " "
+  fi
+
+  if [ -d "/opt/tomcat" ]
+  then
+    sudo rm -rf /opt/tomcat
+    echo "Tomcat files removed."
+    echo " "
+  fi
+else
+  echo "tomcat/purge takes no parameters.  Were you expecting something else?"
+  echo " "
+  exit 1
+fi
+
+

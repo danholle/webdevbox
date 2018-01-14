@@ -1,0 +1,28 @@
+#!/bin/bash
+
+############################################################
+#
+# Remove nginx server installed by 'install' script
+#
+############################################################
+
+echo " "
+if [ "$#" -eq 0 ]
+then
+  echo "Blowing away nginx."
+  systemctl is-active nginx >/dev/null 2>&1 && sudo systemctl stop nginx
+  sudo systemctl disable nginx
+  sudo rm -f /etc/systemd/system/nginx.service
+  sudo rm -rf /var/www/html/*
+  sudo apt-get -y purge nginx nginx-common
+  sudo apt-get -y autoremove
+  sudo rm -rf /etc/nginx
+  sudo systemctl daemon-reload
+  echo "nginx has been purged."
+  echo " "
+else
+  echo "gateway/purge takes no parameters.  Were you expecting something else?"
+  echo " "
+  exit 1
+fi
+

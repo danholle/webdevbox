@@ -1,0 +1,80 @@
+#!/bin/bash
+
+#############################
+#                           
+#  Gateway Setup for Webapp Development Box  
+#
+#############################
+
+echo " "
+
+# Check to see if it's already installed
+if [ -d /usr/nginx ]
+then
+  echo "It looks like your gateway server (nginx) is already installed.  If you"
+  echo "want to remove what's there and clean re-install, use these commands:"
+  echo " "
+  echo "    gateway/purge"
+  echo "    gateway/install"
+  echo " "
+  exit 1
+fi
+
+# check prerequisites?  ... ok, but there are none.
+
+# check parameters ... there should be 0
+if [ "$#" -gt 0 ]
+then
+  echo "WTF?!?  I wasn't expecting parameters.  Just say "
+  echo " "
+  echo "    gateway/install"
+  echo " "
+  echo "and I'll just do it."
+  echo " "
+  exit 1
+fi
+
+echo " "
+echo "Setting the firewall to allow ssh, http, https traffic" 
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+echo " "
+echo "Installing your secure gateway, nginx (reverse proxy)"
+sudo apt-get -y install nginx
+sudo systemctl stop nginx
+
+# Put original nginx config in "sites-available/original"
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/original
+
+# Create and link "gateway" config.  Write it to default, too.
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/gateway
+sudo sed -i "s/ index.htm / index.htm webdevbox.html /g" /etc/nginx/sites-available/gateway
+sudo cp /etc/nginx/sites-available/gateway /etc/nginx/sites-available/default
+
+# nginx is set up to serve static HTML from /var/www/html.
+# Put our "Hello World" page there.
+sudo cp gateway/webdevbox.html /var/www/html/webdevbox.html
+sudo chmod -R 777 /var/www/html
+
+# Set nginx to start automatically at system startup.
+sudo systemctl enable nginx
+
+# Start it now with our new conf
+sudo systemctl start nginx
+
+echo " "
+echo "-----------------------------------------------------"
+echo " "
+echo "Your gateway server (nginx) is installed and running.  Next steps:"
+echo " *  Access Hello World page via nginx using browser (from local or network peer)"
+echo " *  Do port forwarding for SSH, HTTP, and HTTPS on your router/hub"
+echo " *  Check that only these ports are visible externally"
+echo " *  Access Hello World page from public internet"
+echo "For detailed instructions, see the gateway README. "
+echo " "
+echo "Once that all works, you're ready to connect your external URL to your box (url2box)."
+echo " "
+

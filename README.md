@@ -1,16 +1,49 @@
+<p style="font-size: large; font-weight: bold; font-style: italic">
+  webdevbox:
+</p>
+<p style="font-size: x-large; font-weight: bold">
+  Setting Up a Web Application Development Server
+</p>
 
-<h1><b><i>webdevbox:</i><br/>Setup Scripts for a Web Application Development Server</b></h1>
+TODO List:
+ *  Do a security advice page:  https://help.ubuntu.com/community/SSH/OpenSSH/Configuring 
+ *  Switch to pulling Tomcat from Apache archive
+ *  ~~Get commonbase/gateway/url2box/certify to work end to end for GoDaddy~~
+ *  Get them to work end to end for No-IP
+ *  Rationalize purge for each unit:  we are removing a partially installed
+    or somehow broken thing to a clean point, not a clean rollback
+ *  Rationalize install scripts to be like gateway/install:  i.e.
+     *  Check if already installed (offer purge if reinstall desired)
+     *  Check if prereqs WE USE are in place
+     *  Check parameter validity
+     *  Actually do it
+     *  Describe validation steps
+     *  Describe what is next if validation works
+ *  Rationalize writeups for each unit
+     *  Common header format
+     *  Describe what function we are fulfilling
+     *  What do I need to do?
+     *  Validation steps
+     *  Next Steps with link to its .md
+ *  Fix up this main writeup 
+     *  Common header format
+     *  Objective
+     *  Assumptions
+     *  Overview of solution / ground rules
+         *  Links out to TL;DR pages
+     *  Quick Start Example
+         *  Just the script
+ *  Do a once-over eyeballing .md files and links
+ *  Do a dry run through GoDaddy and No-IP
+ *  gitsave
 
-Building web applications on a home server is one thing. Making  
-them available on the public internet is something else.
+-------
+
+Building web applications on a home server is one thing. Making them available on the public internet is something else.
   
-Dealing with dynamic IP's, controlling
-and securing what's visible externally, certificates and 
-encryption... it's not exactly rocket science, but it can be
-a pain to get it all to play nicely together.
+Dealing with dynamic IP's, controlling and securing what's visible externally, certificates and encryption... it's not exactly rocket science, but it can be a pain to get it all to play nicely together.
 
-If you're trying to do something similar, and these scripts
-can take away that pain for you, terrific.
+If you're trying to do something similar, and these scripts can take away that pain for you, terrific.
 
 --------
 
@@ -21,21 +54,24 @@ Starting point:
     server to appear on the public internet... either
      *  a domain from GoDaddy, or 
      *  a dynamic IP forwarding URL from no-ip.com (free). 
-     *  *I'm not promoting either of these;  these are 
+     *  Note:  *I'm not promoting either of these;  these are 
         just the ones I've successfully used and scripted.*
 
 Ending point:
- *  Your URL is connected to your Ubuntu machine.
+ *  Any internet browser who goes to your URL is connected to your Ubuntu machine.
  *  That URL remains connected through your home broadband
     dynamic IP address through a DNS updater which runs 
     automatically and transparently (systemd service).
  *  Inbound web traffic is routed first to a (reverse)
     proxy server (nginx) which acts as a secure gatekeeper
      *  All interactions are through a certified, encrypted
-        connection
-     *  You can choose which content you wish to expose
-        externally, without losing local access to other
-        content (e.g. administrative stuff, test/dev stuff)
+        connection to protect you and your clients
+     *  You have ultimate control on what resources you 
+        expose externally and how... potentially delivering
+        HTML, servlet/JSP, and/or node.js content 
+     *  In particular, you can prevent access to content 
+        you DON'T wish to expose externally, such as test/dev
+        content or administrative tools
  *  Multiple back end web servers assumed.  Currently
     Tomcat for servlet/JSP webapps;  nginx for pure
     HTML5.  Planned:  node.js, Jenkins (for CD/CI)
@@ -49,32 +85,31 @@ Ending point:
 Everything here is quick, so we are almost done.
 
 Let's say you have set up a dynamic IP on no-ip.com
-which is xyz.ddns.net.  (I apologize to anybody who
+which is mynoipdomain.ddns.net.  (I apologize to anybody who
 might own that;  no offense intended.)
-
-If you have a place where you normally put git repos,
-cd to that.  But if you don't have such a place, no 
-worries... this will all work.
 
 Enter the following commands:
 
     git clone https://github.com/danholle/webdevbox
     cd webdevbox
-    base/install
+    nginx/install
+    tomcat/install 8081
     dnsnoip/install
-    certificate/install xyz.ddns.net
+    certificate/install mynoipdomain.ddns.net
     
 After those 5 commands, you should be able to go to 
-your URL (like xyz.ddns.net) and you should see a
-Hello World page from your home machine.
+your URL (in the example, mynoipdomain.ddns.net) and you should see a
+Hello World page from your home machine.  
 
-If you are using a GoDaddy domain, say xyz.com,
+If you are using a GoDaddy domain, the last two commands will change.  For the sake
+of discussion, lets say your GoDaddy domain name is mygodaddydomain.com (again, the
+same apologies apply.)  say xyz.com,
 replace the dnsnoip step above with 
 
     dnsgodaddy/install "xyz.com" "TheG00FyLongPublicKey" "TheG00fyLongPrivate"
 
 where the 2 keys above emerge when you go to developer.godaddy.com, 
-click on the Keys link, and create a Production key (+).
+click on the Keys link, and create a Production key (by clicking on the + sign).
 
 I have to go now.  But I hope you are on your way.  If this works for you,
 let me know at webdevbox@danholle.com.  If it does NOT work for you, then

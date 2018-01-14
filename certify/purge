@@ -4,8 +4,7 @@
 # in a semi-pristine environment.
 
 echo " "
-echo "Blowing away certbot/letsencrypt."
-#sudo systemctl stop nginx 
+echo "Blowing away certbot and friends."
 sudo apt-get -y purge python-certbot-nginx
 sudo apt-get -y autoremove
 sudo apt-get -y clean
