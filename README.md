@@ -1,9 +1,5 @@
-<p style="font-size: large; font-weight: bold; font-style: italic">
-  webdevbox:
-</p>
-<p style="font-size: x-large; font-weight: bold">
-  Setting Up a Web Application Development Server
-</p>
+## ***webdevbox:***
+# **Setting Up a Web Application Development Server**
 
 TODO List:
  *  Do a security advice page:  https://help.ubuntu.com/community/SSH/OpenSSH/Configuring 
