@@ -10,38 +10,75 @@ services from outfits like No-IP.
 
 This step is about connecting this external URL to your webdevbox.
 
-blah blah blah
-
 
 ## **What do I need to do?**
 
-I've put together tools for the two services I mentioned above...
-GoDaddy and No-IP. blah blah blah
+That depends.  Perhaps you have a domain, and already have some way
+of connecting that domain to your home IP address.  If so, great...
+we're done and you can move on to the next thing.
 
-    url2box/noip/install webdevboxexample.ddns.net
+But if you don't, I've put together tools for the two services I 
+mentioned above... GoDaddy and No-IP.  I'm not advocating or pushing
+either of these;  it's just that I've used both, and if my scripts
+are helpful to you, fine.  
 
-blah blah blah
+If you are using some other service, you
+may find that you can adapt these scripts to do your bidding.
 
-    url2box/godaddy/install webdevboxexample.com "G0ofyV3ryL0ngK3y" "5h0rt3rPr1vat3K3y"
+### If you have a [noip](noip/README.md) URL...
 
-blah blah blah
+There are a number of companies which do dynamic IP forwarding for
+free.  The largest of these is No-IP.
+
+A URL from www.noip.com consists of a name you come up with (let's say
+mynoipprefix) followed by a domain that No-IP owns (like ddns.net).  
+Their service is to let you route requests to the composite name 
+(in this case, mynoipprefix.ddns.net) to your IP address.
+
+First, go to www.noip.com and lay claim to your shiny new URL.
+
+To set up a DNS updater that keeps your URL pointing at your webdevbox,
+just say
+  
+    url2box/noip/install mynoipprefix.ddns.net
+
+Once that's all done, you will be able to fire up a browser anywhere 
+and go to 
+
+    http://mynoipprefix.ddns.net
+
+and you should see the Hello World page, faithfully rendered by your 
+friendly neighbourhood webdevbox.  
 
 
-## **I'm done.  Did it work?**
+### If you have a [godaddy](godaddy/README.md) URL...
 
-Well, probably.  But if you'd like to make sure, and you should, you can now test 
-the IP forwarding by trying out your URL.  In a browser on a web-connected client
-machine, go to your URL... if you're using a domain provider like GoDaddy, something
-like
+GoDaddy is the biggest domain registrar in the world, so maybe you 
+have a domain with them.  Let's say you're the proud owner of
+mygodaddydomain.com, and want to make that name forward to your 
+webdevbox.
 
-    http://webdevboxexample.com
+To set this up, you need to first go to GoDaddy and get some API
+keys which will be used in updating your IP.  Go to 
 
-or if you're using a dynamic IP provider like No-IP, maybe
-    
-    http://webdevboxexample.ddns.net
+    developer.godaddy.com
 
-or whatever.  For your efforts, you should see a Hello World page we installed on
-a previous step.
+and click on Keys.  Create a new PRODUCTION key pair.  Now you are
+ready to set up your DNS updater:
+
+    url2box/godaddy/install "G0ofyV3ryL0ngK3y" "5h0rt3rPr1vat3K3y" mygodaddydomain.com
+
+This will create a DNS updater on your webdevbox which will update
+mygodaddydomain.com's IP address when it starts, then again whenever
+your home IP changes.  The updater starts as a daemon every time
+your webdevbox starts.
+
+Now you should be able to go to 
+
+    http://mygodaddydomain.com
+
+and be rewarded with our Hello World page brought to you by your 
+webdevbox, with a little help from nginx.
 
 
 ## **What do I do next?**

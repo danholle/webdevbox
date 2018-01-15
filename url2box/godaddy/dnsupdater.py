@@ -6,14 +6,16 @@ import time
 import logging
 
 # GoDaddy domain & authentication
-domain="GODADDYDOMAIN"
+domains="GODADDYDOMAINS".strip()
 publickey="GODADDYPUBLICKEY"
 privatekey="GODADDYPRIVATEKEY"
+
+domainlist=domains.split(" ")
 
 logging.basicConfig(filename="dnsupdater.log",filemode='a',
     level=logging.INFO, format='%(asctime)s: %(message)s',
     datefmt='%Y/%m/%d %H:%M:%S')
-logging.info("dnsupdater:  Updating IP address for "+domain+" on GoDaddy.")
+logging.info("dnsupdater:  Updating IP address for "+domains+" on GoDaddy.")
 acct=godaddypy.Account(api_key=publickey,api_secret=privatekey)
 previp="none"
 passno=0
@@ -31,8 +33,8 @@ while True:
       logging.info("IP changed from "+previp+" to "+currip+".")
     client=godaddypy.Client(acct)
     logging.info("Logged into godaddy.")
-    client.update_ip(currip,domains=[domain])
-    logging.info("Set the address for "+domain+" to "+currip+".")
+    client.update_ip(currip,domains=domainlist)
+    logging.info("Set the address for "+domains+" to "+currip+".")
     previp=currip
     client=None
   # end if changed IP
