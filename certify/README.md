@@ -1,9 +1,5 @@
-<p style="font-size: large; font-weight: bold; font-style: italic">
-  webdevbox/certify:
-</p>
-<p style="font-size: x-large; font-weight: bold">
-  Creating Free SSL Certificates For Your Site
-</p>
+## ***webdevbox/certify:***
+# **Creating Free SSL Certificates For Your Site**
 
 --------
 
@@ -16,7 +12,7 @@ pushbutton to leverage their handiwork.
 You have no idea how close you are to achieving greatness.
 
 
-<h2>What do I need to do?</h2>
+## **What do I need to do?**
 
 Let's say your domain/URL is blah.com.  Your next step would be to say
 
@@ -30,7 +26,7 @@ and sit back while it does all the heavy lifting for you.  It will
     config that allows you to test access HTML (nginx) or a servlet (Tomcat).
 
 
-<h3>I did my bit.  Did it work?</h3>
+## **I did my bit.  Did it work?**
 
 Well, probably.  You can check it easy enough:  on any browser on the planet, 
 go to 
@@ -49,7 +45,7 @@ and you should see Tomcat's documentation home page.  Note that, again, the
 session was quietly upgraded to HTTPS.
 
 
-<h2>What do I do next?</h2>
+## **What do I do next?**
 
 Well, you need to tailor up an nginx configuration file that matches your 
 needs.  This may well take you out of your comfort zone and into somebody

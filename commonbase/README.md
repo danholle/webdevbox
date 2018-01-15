@@ -17,7 +17,7 @@ current, complete, and stable software.  Then we set about installing
      *  build-essential, openjdk-8-jdk, python3-dev
      *  pip3, maven, Python libraries 
 
-<h2>What do I need to do?</h2>
+## **What do I need to do?**
 
 Your job is easy.  Assuming you've cd'd to webdevbox, just say
 
@@ -26,13 +26,13 @@ Your job is easy.  Assuming you've cd'd to webdevbox, just say
 and kick back.  No input, no actions, just wait.  And you won't wait long.
 
 
-<h2>I'm done.  Did it work?</h2>
+## **I'm done.  Did it work?**
 
 Well, normally I'd give you a few things you can do to check it out.  In this case,
 that seems a bit heavy-handed.  Let's pretend it just worked.
 
 
-<h2>What do I do next?</h2>
+## **What do I do next?**
 
 Next we will set up nginx as a secure [gateway](../gateway/README.md) 
 between the public internet and our web server(s) and content.

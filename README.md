@@ -1,60 +1,37 @@
 ## ***webdevbox:***
 # **Setting Up a Web Application Development Server**
 
-TODO List:
- *  Do a security advice page:  https://help.ubuntu.com/community/SSH/OpenSSH/Configuring 
- *  Switch to pulling Tomcat from Apache archive
- *  ~~Get commonbase/gateway/url2box/certify to work end to end for GoDaddy~~
- *  Get them to work end to end for No-IP
- *  Rationalize purge for each unit:  we are removing a partially installed
-    or somehow broken thing to a clean point, not a clean rollback
- *  Rationalize install scripts to be like gateway/install:  i.e.
-     *  Check if already installed (offer purge if reinstall desired)
-     *  Check if prereqs WE USE are in place
-     *  Check parameter validity
-     *  Actually do it
-     *  Describe validation steps
-     *  Describe what is next if validation works
- *  Rationalize writeups for each unit
-     *  Common header format
-     *  Describe what function we are fulfilling
-     *  What do I need to do?
-     *  Validation steps
-     *  Next Steps with link to its .md
- *  Fix up this main writeup 
-     *  Common header format
-     *  Objective
-     *  Assumptions
-     *  Overview of solution / ground rules
-         *  Links out to TL;DR pages
-     *  Quick Start Example
-         *  Just the script
- *  Do a once-over eyeballing .md files and links
- *  Do a dry run through GoDaddy and No-IP
- *  gitsave
-
 -------
 
-Building web applications on a home server is one thing. Making them available on the public internet is something else.
+Building web applications on a home server is one thing. 
+Making them available on the public internet is something 
+else.
   
-Dealing with dynamic IP's, controlling and securing what's visible externally, certificates and encryption... it's not exactly rocket science, but it can be a pain to get it all to play nicely together.
+Dealing with dynamic IP's, controlling and securing what's 
+visible externally, certificates and encryption... it's 
+not exactly rocket science, but it can be a pain to get it 
+all to play nicely together.
 
-If you're trying to do something similar, and these scripts can take away that pain for you, terrific.
+If you're trying to do something similar, and these scripts 
+can take away that pain for you, terrific.
 
 --------
 
 Starting point:
- *  You have an Ubuntu machine on a home network with a
+ *  You have an Ubuntu machine you want to use as a platform for
+    developing and running web applications
+ *  That machine is on a home network with a
     broadband connection through some router/hub
  *  You have set up an URL where you want your
-    server to appear on the public internet... either
+    server to appear on the public internet... for example, 
      *  a domain from GoDaddy, or 
      *  a dynamic IP forwarding URL from no-ip.com (free). 
      *  Note:  *I'm not promoting either of these;  these are 
         just the ones I've successfully used and scripted.*
 
 Ending point:
- *  Any internet browser who goes to your URL is connected to your Ubuntu machine.
+ *  Any internet browser who goes to your URL is connected 
+    to your Ubuntu machine.
  *  That URL remains connected through your home broadband
     dynamic IP address through a DNS updater which runs 
     automatically and transparently (systemd service).
@@ -73,44 +50,65 @@ Ending point:
     HTML5.  Planned:  node.js, Jenkins (for CD/CI)
  *  These simply appear on the public internet as different
     paths from your public URL   
- 
+
 --------
 
-<h2>Quick Start</h2>
+Setting up the webdevbox is broken into the following steps.  
+Each step has a TL;DR writeup that takes you through the
+process in some detail.
+ *  [commonbase](commonbase/README.md) installs common prerequisites:  compilers, build tools, libraries.
+ *  [gateway](gateway/README.md) installs a gateway server to manage secure inbound connections from the Web
+ *  [url2box](url2box/README.md) sets up a link between your external URL and your webdevbox (dynamic IP).
+ *  [tomcat](tomcat/README.md) sets up the Apache Tomcat web server
+ *  [certify](certify/README.md) creates a security certificate and configures the gateway for it.
 
-Everything here is quick, so we are almost done.
+--------
 
-Let's say you have set up a dynamic IP on no-ip.com
-which is mynoipdomain.ddns.net.  (I apologize to anybody who
-might own that;  no offense intended.)
+## **Quick Start**
 
-Enter the following commands:
+I'm going to assume you have this page up on a
+browser, and that you've got command line access
+to your webdevbox with sudo privileges.
+
+First, let's grab the scripts and temporarily land
+them on your webdevbox:
 
     git clone https://github.com/danholle/webdevbox
     cd webdevbox
-    nginx/install
-    tomcat/install 8081
-    dnsnoip/install
-    certificate/install mynoipdomain.ddns.net
-    
-After those 5 commands, you should be able to go to 
-your URL (in the example, mynoipdomain.ddns.net) and you should see a
-Hello World page from your home machine.  
 
-If you are using a GoDaddy domain, the last two commands will change.  For the sake
-of discussion, lets say your GoDaddy domain name is mygodaddydomain.com (again, the
-same apologies apply.)  say xyz.com,
-replace the dnsnoip step above with 
+Now let's install the common base (prerequisites):
 
-    dnsgodaddy/install "xyz.com" "TheG00FyLongPublicKey" "TheG00fyLongPrivate"
+    commonbase/install
 
-where the 2 keys above emerge when you go to developer.godaddy.com, 
-click on the Keys link, and create a Production key (by clicking on the + sign).
+Now let's install the secure gateway.  We use nginx for
+this.  This step also includes things like setting
+up port forwarding; see the [gateway](gateway/README.md)
+TL;DR writeup first.  
 
-I have to go now.  But I hope you are on your way.  If this works for you,
-let me know at webdevbox@danholle.com.  If it does NOT work for you, then
-ESPECIALLY let me know.  
+    gateway/install
 
-Thanks a bunch.
- 
+Now let's connect our external URL to the webdevbox.
+If, for example, you have used No-IP.com to set up an
+URL like mynoipurl.ddns.net, you would next say
+
+    url2box/noip/install mynoipurl.ddns.net
+
+or, if you have a GoDaddy URL like mygodaddyurl.com,
+
+    url2box/godaddy/install mygodaddyurl.com "myL0n6Pub1icK3y" "pr1vat3k3y"
+
+where the keys are from GoDaddy (see the [url2box](url2box/README.md)]
+writeup for details).  Then we'll install Tomcat:
+
+    tomcat/install 8081 admin s3cr3t
+
+which, as described in the [tomcat writeup,](tomcat/README.md) will 
+set up Tomcat listening on port 8081.  Now we'll set up our 
+certified secure connection:
+
+    certify/install mygodaddyurl.com
+
+And you're up and running!
+
+
 
