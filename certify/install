@@ -8,7 +8,7 @@ then
   echo "to remove what's there and clean re-install, use these commands:"
   echo " "
   echo "    certify/purge"
-  echo "    certify/install $1 "
+  echo "    certify/install $* "
   echo " "
   exit 1
 fi
@@ -21,20 +21,32 @@ then
   exit 1
 fi
 
-# check parameters ... there should be 0
-if [ "$#" -ne 1 ]
+# check parameters ... there should be at least 1
+if [ "$#" -eq 0 ]
 then
-  echo "WTF?!?  I wasn't expecting parameters.  Just say "
+  echo "WTF?!?  I need URLs to certify. Something like "
   echo " "
-  echo "    gateway/install"
+  echo "    gateway/install blah.com www.blah.com"
   echo " "
   exit 1
 fi
 
+# Check that all the URLs provided point to this IP address
+# If not, certbot will croak anyway.
+python3 certify/checkurls.py $*
+if [ $? -eq 0 ]
+then
+  echo "URLs all point to this IP address.  Good job!"
+else
+  echo "Fix the problem and try again."
+  exit 1
+fi
+
+
 # Create a new nginx config for certbot challenge
 # Like gateway, but server_name is our public URL
 sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/precertify
-sudo sed -i "s/server_name _/server_name $1/g" /etc/nginx/sites-available/precertify
+sudo sed -i "s/server_name _/server_name $*/g" /etc/nginx/sites-available/precertify
 sudo cp /etc/nginx/sites-available/precertify /etc/nginx/sites-available/default
 sudo systemctl reload nginx
 
@@ -42,11 +54,20 @@ echo " "
 echo "Installing certbot for nginx..."
 sudo apt-get install -y python-certbot-nginx
 
+# certbot does not like url1 url2 url3
+# certbot DOES like -d url1 -d url2 -d url3.
+# humour him.
+dlist=""
+for url in "$@"
+do
+  dlist="$dlist -d $url"
+done
+
 echo " "
 echo "Generating certificates.  Right answer is 1."
 #sudo ufw disable
-#sudo certbot --nginx -d $1
-sudo certbot --authenticator webroot --webroot-path /var/www/html --installer nginx -d $1 
+#sudo certbot --nginx $dlist
+sudo certbot --authenticator webroot --webroot-path /var/www/html --installer nginx $dlist 
 #exit
 
 # Grab nginx config as doctored by certbot.
@@ -61,7 +82,7 @@ tomcatport=8080
 # Fill in the substitutions in our new nginx config
 sudo sed -i "s/TOMCATPORT/$tomcatport/g" /etc/nginx/sites-available/certified
 sudo sed -i "s/WEBDEVDOMAINNAME/$1/g" /etc/nginx/sites-available/certified
-sudo sed -i "s/server_name _/server_name $1/g" /etc/nginx/sites-available/certified
+sudo sed -i "s/server_name _/server_name $*/g" /etc/nginx/sites-available/certified
 sudo cp /etc/nginx/sites-available/certified /etc/nginx/sites-available/default
 sudo systemctl reload nginx
 
@@ -72,4 +93,5 @@ echo "You are now set to use $1 to securely access your webdevbox from the publi
 echo "All traffic encrypted.  $1/docs redirects to localhost:$tomcatport/docs;  anything else will"
 echo "serve static content from /var/www/html.  To change this behaviour, edit nginx config"
 echo "/etc/nginx/sites-available/default which has embedded hints for you..."
+echo " "
 
