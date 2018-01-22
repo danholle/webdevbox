@@ -4,94 +4,41 @@ echo " "
 # Check to see if it's already installed
 if [ -d /etc/letsencrypt ] | [ -f /etc/nginx/sites-available/precertify.conf ] | [ -f /etc/nginx/sites-available/certified.conf ]
 then
-  echo "It looks like certify/install has already been run.  If you want"
-  echo "to remove what's there and clean re-install, use these commands:"
+  echo "There are already certbot certificate(s), so it would seem "
+  echo "certbot is already installed.  If you want to remove what's "
+  echo "there and clean re-install, use these commands:"
   echo " "
   echo "    certify/purge"
-  echo "    certify/install $* "
+  echo "    certify/install"
   echo " "
   exit 1
 fi
 
-# check prerequisites
-if [ ! -d /etc/nginx ] | [ ! -f /etc/nginx/sites-available/gateway ]
-then 
-  echo "You need to do 'gateway/install' before you can certify."
-  echo " "
-  exit 1
-fi
 
 # check parameters ... there should be at least 1
 if [ "$#" -eq 0 ]
 then
-  echo "WTF?!?  I need URLs to certify. Something like "
   echo " "
-  echo "    gateway/install blah.com www.blah.com"
+  echo "Installing certbot for nginx..."
+  sudo apt-get install -y python-certbot-nginx
   echo " "
-  exit 1
-fi
-
-# Check that all the URLs provided point to this IP address
-# If not, certbot will croak anyway.
-python3 certify/checkurls.py $*
-if [ $? -eq 0 ]
-then
-  echo "URLs all point to this IP address.  Good job!"
+  echo "Now you can create a certificate byproviding a list of URLs"
+  echo "you want to include, like this:"
+  echo "  "
+  echo "    certify/urls xyz.com www.xyz.com xyz.ddns.net"
+  echo "  "
+  echo "Or, if you'd like to check your URLs before you go for a"
+  echo "certificate, you could check verify they resolve to your"
+  echo "host first:"
+  echo " "
+  echo "    certify/check xyz.com www.xyz.com xyz.ddns.net"
+  echo " "
 else
-  echo "Fix the problem and try again."
-  exit 1
+  echo " "
+  echo "certify/install takes no parameters.  Just say"
+  echo " "
+  echo "    certify/install"
+  echo " "
 fi
 
-
-# Create a new nginx config for certbot challenge
-# Like gateway, but server_name is our public URL
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/precertify
-sudo sed -i "s/server_name _/server_name $*/g" /etc/nginx/sites-available/precertify
-sudo cp /etc/nginx/sites-available/precertify /etc/nginx/sites-available/default
-sudo systemctl reload nginx
-
-echo " "
-echo "Installing certbot for nginx..."
-sudo apt-get install -y python-certbot-nginx
-
-# certbot does not like url1 url2 url3
-# certbot DOES like -d url1 -d url2 -d url3.
-# humour him.
-dlist=""
-for url in "$@"
-do
-  dlist="$dlist -d $url"
-done
-
-echo " "
-echo "Generating certificates.  Right answer is 1."
-#sudo ufw disable
-#sudo certbot --nginx $dlist
-sudo certbot --authenticator webroot --webroot-path /var/www/html --installer nginx $dlist 
-#exit
-
-# Grab nginx config as doctored by certbot.
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/postcertify
-
-# Install the nginx config we want to run with
-sudo cp certify/certified /etc/nginx/sites-available/certified
-
-tomcatport=8080
-[ -f tomcat/setport ] && source tomcat/setport
-
-# Fill in the substitutions in our new nginx config
-sudo sed -i "s/TOMCATPORT/$tomcatport/g" /etc/nginx/sites-available/certified
-sudo sed -i "s/WEBDEVDOMAINNAME/$1/g" /etc/nginx/sites-available/certified
-sudo sed -i "s/server_name _/server_name $*/g" /etc/nginx/sites-available/certified
-sudo cp /etc/nginx/sites-available/certified /etc/nginx/sites-available/default
-sudo systemctl reload nginx
-
-sudo systemctl reload nginx
-
-echo " "
-echo "You are now set to use $1 to securely access your webdevbox from the public internet."
-echo "All traffic encrypted.  $1/docs redirects to localhost:$tomcatport/docs;  anything else will"
-echo "serve static content from /var/www/html.  To change this behaviour, edit nginx config"
-echo "/etc/nginx/sites-available/default which has embedded hints for you..."
-echo " "
 

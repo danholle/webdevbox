@@ -23,21 +23,14 @@ fi
 if [ "$#" -gt 2 ]
 then
   echo " "
-  echo "Installing DNS updater to link your GoDaddy domain $1 with this webdevbox."
-
+  echo "Installing DNS updater to link your GoDaddy domain $3 with this webdevbox."
   echo " "
   echo "Writing the DNS updater to /usr/local/bin..."
   sudo cp url2box/godaddy/dnsupdater.py /usr/local/bin/dnsupdater.py
   sudo sed -i "s/GODADDYPUBLICKEY/$1/g" /usr/local/bin/dnsupdater.py
   sudo sed -i "s/GODADDYPRIVATEKEY/$2/g" /usr/local/bin/dnsupdater.py
   shift 2
-  sudo sed -i "s/GODADDYDOMAIN/$*/g" /usr/local/bin/dnsupdater.py
-
-  echo " "
-  echo "Writing your initial HTML index page to /var/www/html/webdevbox.html..."
-  sudo cp url2box/webdevbox.html /var/www/html/webdevbox.html
-  sudo sed -i "s/PUBLICURL/$1/g" /var/www/html/webdevbox.html
-  sudo sed -i "s/URLSERVICE/godaddy/g" /var/www/html/webdevbox.html
+  sudo sed -i "s/GODADDYDOMAINS/$*/g" /usr/local/bin/dnsupdater.py
 
   echo " "
   echo "Setting up DNS updater log file..."
@@ -62,13 +55,17 @@ then
   echo " -  Check the log with the command 'cat /usr/local/bin/dnsupdater.log'"
   echo " -  Go to http://$1 in your browser to access your webdevbox via your GoDaddy domain."
   echo " "
-  echo "If these are both good, you're ready to certify:  certify/install $1 "
+  echo "If these are both good, you're ready to certify: "
+  echo " "
+  echo "    certify/install "
+  echo "    certify/checklist $@ "
+  echo "    certify/certlist  $@ "
   echo " "
 else
   echo " "
   echo "Ahem!  That's just wrong.  I was expecting something like this:"
   echo " "
-  echo "    url2box/godaddy/install \"xyz.com\" \"ThIs1sAveryLONGpublicKEY\" \"AshorterPRIVATEkey\" "
+  echo "    url2box/godaddy/install \"ThIs1sAveryLONGpublicKEY\" \"AshorterPRIVATEkey\" xyz.com "
   echo " "
   echo "where xyz.com is the GoDaddy domain you are using as the public face of your"
   echo "webdevbox, and the two keys come from going to developer.godaddy.com and clicking"

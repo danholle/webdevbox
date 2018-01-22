@@ -1,0 +1,90 @@
+#!/bin/bash
+echo " "
+
+# check prerequisites
+if [ ! -d /etc/nginx ] | [ ! -f /etc/nginx/sites-available/basic ]
+then 
+  echo "You need to do 'gateway/install' before you can create"
+  echo "certificates."
+  echo " "
+  exit 1
+fi
+
+# check parameters ... there should be at least 1
+if [ "$#" -eq 0 ]
+then
+  echo "WTF?!?  I need URLs to certify. Something like "
+  echo " "
+  echo "    certify/urls xyz.com www.xyz.com xyz.ddns.net"
+  echo " "
+  echo "These URLs should resolve to this machine's IP address,"
+  echo "perhaps through the use of url2box's bag of DNS tricks."
+  echo "Try again..."
+  exit 1
+fi
+
+# Check that all the URLs provided point to this IP address
+# If not, certbot will croak anyway.
+python3 certify/checkurls.py $*
+if [ $? -eq 0 ]
+then
+  echo "URLs all point to this IP address.  Good job!"
+else
+  echo "Fix the problem and try again."
+  exit 1
+fi
+
+
+# Create a new nginx config for certbot challenge
+# Like gateway, but server_name is our public URL
+[ -L /etc/nginx/sites-enabled/default ] && sudo unlink /etc/nginx/sites-enabled/default
+[ -L /etc/nginx/sites-enabled/basic ] && sudo unlink /etc/nginx/sites-enabled/basic
+sudo cp /etc/nginx/sites-available/basic /etc/nginx/sites-available/precertify
+sudo sed -i "s/server_name _/server_name $* /g" /etc/nginx/sites-available/precertify
+sudo ln -s /etc/nginx/sites-available/precertify /etc/nginx/sites-enabled/
+sudo systemctl reload nginx
+
+# certbot does not like url1 url2 url3
+# certbot DOES like -d url1 -d url2 -d url3.
+# humour him.
+dlist=""
+for url in "$@"
+do
+  dlist="$dlist -d $url"
+done
+
+rm -f setconfig 
+rm -f certify/setconfig
+echo "#!/bin/bash" > setconfig
+echo "export certname = $1 " >> setconfig
+echo "export certlist = $@ " >> setconfig
+mv setconfig certify/setconfig
+chmod +x certify/setconfig
+
+echo " "
+echo "Generating certificates.  Right answer is 1."
+sudo certbot --authenticator webroot --webroot-path /var/www/html --installer nginx $dlist 
+
+# Install the nginx config we want to run with
+sudo cp certify/https4all /etc/nginx/sites-available/https4all
+sudo cp certify/rosetta /etc/nginx/sites-available/rosetta
+
+tomcatport=8080
+[ -f tomcat/setport ] && source tomcat/setport
+
+# Fill in the substitutions in our new nginx config
+sudo sed -i "s/TOMCATPORT/$tomcatport/g" /etc/nginx/sites-available/rosetta
+sudo sed -i "s/CERTNAME/$1/g" /etc/nginx/sites-available/rosetta
+sudo sed -i "s/server_name _/server_name $* /g" /etc/nginx/sites-available/rosetta
+sudo ln -s /etc/nginx/sites-available/rosetta /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/https4all /etc/nginx/sites-enabled/ 
+sudo unlink /etc/nginx/sites-enabled/precertify
+sudo systemctl reload nginx
+
+echo " "
+echo "You are now set to use $1 to securely access your webdevbox from the public internet."
+echo "All traffic encrypted.  $1/docs redirects to localhost:$tomcatport/docs;  anything else will"
+echo "serve static content from /var/www/html.  To change this behaviour, edit nginx config"
+echo "/etc/nginx/sites-available/default which has embedded hints for you..."
+echo " "
+

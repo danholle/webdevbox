@@ -1,0 +1,60 @@
+#!/bin/bash
+
+#############################
+#                           
+# Set up PHP and friends
+#
+#############################
+
+echo " "
+
+# Check to see if it's already installed
+if [ -f /run/php/* ]
+then
+  echo "It looks like php is already installed.  If you want to remove"
+  echo "what's there and clean re-install, use these commands:"
+  echo " "
+  echo "    php/purge"
+  echo "    php/install" 
+  echo " "
+  exit 1
+fi
+
+# check prerequisites?  ... ok, but there are none.
+
+# check parameters ... there should be 0
+if [ "$#" -gt 0 ]
+then
+  echo "WTF?!?  Not expecting any parameters.  Just say"
+  echo " "
+  echo "    php/install"
+  echo " "
+  exit 1
+fi
+
+echo " "
+echo "Installing PHP stuff."
+echo " "
+sudo apt-get install php7.0-fpm php7.0-cli php7.0-gd php7.0-mysql php7.0-xml -y
+sudo apt-get install phpmyadmin -y
+
+# install composer, drush TODO
+# fix /etc/php/7.0/fpm TODO 
+# fix .php in nginx TODO
+# fix index.php TODO
+
+sudo systemctl enable php7.0-fpm
+sudo systemctl start php7.0-fpm
+sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+composer global require drush/drush
+cp php/hello.php /var/www/html/hello.php
+
+echo " "
+echo "-----------------------------------------------------"
+echo " "
+echo "PHP is installed and running."
+echo "TODO:  Validation steps."
+echo " "
+echo "Once that all works, TODO (php)."
+echo " "
+

@@ -1,0 +1,18 @@
+# This is the initial nginx configuration, put in place by
+# gateway/install.  This is used as a known starting point
+# for the certify step.
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+
+  root /var/www/html;
+
+  index index.html hello.html index.nginx-debian.html;
+
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}
+

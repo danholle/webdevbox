@@ -1,0 +1,6 @@
+# This server block simply forces everything to HTTPS.
+server {
+  listen 80;
+  return 302 https://$host$request_uri;
+}
+

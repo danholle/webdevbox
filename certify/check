@@ -1,0 +1,65 @@
+#!/bin/bash
+echo " "
+
+# Check to see if it's already installed
+#if [ -d /etc/letsencrypt ] | [ -f /etc/nginx/sites-available/precertify.conf ] | [ -f /etc/nginx/sites-available/certified.conf ]
+#then
+#  echo "It looks like certify/install has already been run.  If you want"
+#  echo "to remove what's there and clean re-install, use these commands:"
+#  echo " "
+#  echo "    certify/purge"
+#  echo "    certify/install $* "
+#  echo " "
+#  exit 1
+#fi
+
+# check prerequisites
+#if [ ! -d /etc/nginx ] | [ ! -f /etc/nginx/sites-available/gateway ]
+#then 
+#  echo "You need to do 'gateway/install' before you can certify."
+#  echo " "
+#  exit 1
+#fi
+
+# check parameters ... there should be at least 1
+if [ "$#" -eq 0 ]
+then
+  echo "WTF?!?  I need URLs that resolve to your local machine.  Something like "
+  echo " "
+  echo "    gateway/install blah.com www.blah.com blah.ddns.net"
+  echo " "
+  exit 1
+fi
+
+# Check that all the URLs provided point to this IP address
+# If not, certbot will croak anyway.
+python3 certify/checkurls.py $*
+if [ $? -eq 0 ]
+then
+  echo " "
+  echo "URLs all point to this IP address.  Good job!"
+  echo " "
+  echo "You are ready to create a certificate like this:"
+  echo " "
+  echo "    certify/certlist $* "
+  echo " "
+  if [ "$#" -gt 1 ]
+  then
+    echo "Note that the certificate will only be identified by the"
+    echo "first URL ($1) so if one of the other URLs would better"
+    echo "characterize the list, you might want to move that one"
+    echo "to the front."
+    echo " "
+  fi
+else
+  echo " "
+  echo "It may be apparent that there's something you can fix.  In"
+  echo "that case, fix the problem and try certify/checklist again."
+  echo " "
+  echo "If you updated these IP addresses recently, it may be that"
+  echo "they haven't propagated through DNS-land yet.  You might "
+  echo "want to wait for an hour and try again."
+  echo " "
+  exit 1
+fi
+

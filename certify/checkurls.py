@@ -7,33 +7,44 @@ import time
 import logging
 
 def getip(u):
+  ans="unknown"
   try:
+    # print("About to check "+u+"...")
     ans=socket.gethostbyname(u)
-  except InsecureRequestWarning: 
-    print("tilt")
+  except socket.gaierror:
+    pass
   # end try
   return ans
 # end def getip
 
 domains=sys.argv[1:]
 print("There are "+str(len(domains))+" URLs in the list.")
-currip=pif.get_public_ip()
-print("Current IP is "+currip)
 
+currip=pif.get_public_ip()
+print("Our current IP is "+currip)
+
+errors=0
+notready=None
 for url in domains:
-  sleepsecs=2
-  errors=0
   urlsip=getip(url)
-  while (urlsip!=currip):
-    print(url+"'s IP is "+urlsip)
+  msg=url+" resolves to "+urlsip
+  if urlsip==currip:
+    print(msg+":  success!")
+  else:
+    print(msg+":  fail!")
+    if notready==None:
+      notready=url
+    else:
+      notready+=" "+url
     errors+=1
-    if (errors>4):
-      print("URL "+url+" does not seem to point to our IP.")
-      exit(1)
-    # end if too many errors
-    time.sleep(sleepsecs)
-    sleepsecs+=sleepsecs 
-    urlsip=getip(url)
-  # end while this url isn't ready
-# end for all urls
+  # end if ip matches our own
+# end for each domain
+
+if errors>0:
+  print("URLs which are not ready:  "+notready)
+  exit(1)
+else:
+  print("Looking good!")
+  exit(0)
+# end if too many errors
 

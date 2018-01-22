@@ -1,0 +1,31 @@
+#!/bin/bash
+
+############################################################
+#
+# Remove mariadb/mysql server installed by 'install' script
+#
+############################################################
+
+echo " "
+if [ "$#" -eq 0 ]
+then
+  echo "Blowing away mysql."
+  sudo service mysql stop
+  sudo systemctl stop mysql
+  sudo killall -KILL mysql mysqld_safe mysqld
+  sudo apt-get --purge remove "mysql*" -y
+  sudo apt-get --yes autoremove --purge
+  sudo apt-get autoclean
+  sudo deluser --remove-home mysql
+  sudo delgroup mysql
+  #sudo rm -rf /etc/apparmor.d/abstractions/mysql /etc/apparmor.d/cache/usr.sbin.mysqld 
+  sudo rm -rf /etc/mysql /var/lib/mysql /var/log/mysql* /var/log/upstart/mysql.log* /var/run/mysqld
+  sudo updatedb
+  echo "mysql has been purged."
+  echo " "
+else
+  echo "mysql/purge takes no parameters.  Were you expecting something else?"
+  echo " "
+  exit 1
+fi
+

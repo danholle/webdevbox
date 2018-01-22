@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Used to blow away PHP so we can test install 
+# in a semi-pristine environment.
+
+echo " "
+echo "Blowing away PHP and friends."
+sudo apt-get -y purge php7.0-fpm php7.0-cli php7.0-gd php7.0-mysql php7.0-xml phpmyadmin
+sudo apt-get -y autoremove
+sudo apt-get -y clean
+sudo rm /usr/local/bin/composer
+sudo rm -rf /home/$USER/.composer

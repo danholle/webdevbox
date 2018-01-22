@@ -20,8 +20,6 @@ then
   exit 1
 fi
 
-# check prerequisites?  ... ok, but there are none.
-
 # check parameters ... there should be 0
 if [ "$#" -gt 0 ]
 then
@@ -46,18 +44,38 @@ echo "Installing your secure gateway, nginx (reverse proxy)"
 sudo apt-get -y install nginx
 sudo systemctl stop nginx
 
-# Put original nginx config in "sites-available/original"
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/original
+# Make config files accessible inside our box
+sudo chmod -R 777 /etc/nginx
+sudo chmod -R 777 /var/www
 
-# Create and link "gateway" config.  Write it to default, too.
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/gateway
-sudo sed -i "s/ index.htm / index.htm webdevbox.html /g" /etc/nginx/sites-available/gateway
-sudo cp /etc/nginx/sites-available/gateway /etc/nginx/sites-available/default
+# nginx has two directories for storing configurations:
+# /etc/nginx/sites-available contains chunks of configuration 
+#    that may or may not be enabled.  Files you'll find here:
+#    default:  The initial config that's there in the default
+#      nginx install.
+#    basic:  Listen on 80, serve html out of /var/www/html.
+#      This is enabled by gateway/install, and is of known
+#      form so certify can manipulate it to do what is needed
+#      by certbot to create certificates
+#    precertify:  This is created during the certify process
+#      to make the challenges work.  Only enabled briefly, only
+#      during the certbot certificate creation.
+#    https4all:  After certification, we force all traffic to
+#      use https.  This does this and is enabled post-cert.
+#    rosetta:  This initially takes all HTTPS traffic for all
+#      URLs and dispatches work out to the place that the 
+#      URL seems to imply.  Default remains serving HTML
+#      from /var/www/html.  Later steps may peel off traffic
+#      for particular URLs, removing them from rosetta's
+#      server_name list.
+#    tomcat:  This is server block placed by tomcat/install.
+[ -L /etc/nginx/sites-enabled/default ] && sudo unlink /etc/nginx/sites-enabled/default
+sudo cp gateway/basic /etc/nginx/sites-available/basic
+sudo ln -s /etc/nginx/sites-available/basic /etc/nginx/sites-enabled
 
 # nginx is set up to serve static HTML from /var/www/html.
 # Put our "Hello World" page there.
-sudo cp gateway/webdevbox.html /var/www/html/webdevbox.html
-sudo chmod -R 777 /var/www/html
+sudo cp gateway/hello.html /var/www/html/hello.html
 
 # Set nginx to start automatically at system startup.
 sudo systemctl enable nginx

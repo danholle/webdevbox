@@ -1,0 +1,64 @@
+#!/bin/bash
+
+#############################
+#                           
+#  Database Setup for Webapp Development Box  
+#
+#############################
+
+echo " "
+
+# Check to see if it's already installed
+if [ -d /etc/mysql ]
+then
+  echo "It looks like your mysql is already installed.  If you want to remove"
+  echo "what's there and clean re-install, use these commands:"
+  echo " "
+  echo "    mysql/purge"
+  echo "    mysql/install"
+  echo " "
+  exit 1
+fi
+
+# check prerequisites?  ... ok, but there are none.
+
+# check parameters ... there should be 0
+if [ "$#" -gt 0 ]
+then
+  echo "WTF?!?  I wasn't expecting parameters.  Just say "
+  echo " "
+  echo "    mysql/install"
+  echo " "
+  echo "and I'll just do it."
+  echo " "
+  exit 1
+fi
+
+echo " "
+echo "Installing mysql.  You'll be asked for a database root"
+echo "password... think of a good one.  We'll be using it later"
+echo "in the install process."
+echo " "
+sudo apt-get install mysql-server -y
+sudo systemctl start mysql
+
+echo " "
+echo " "
+echo "Okay, so we are now going to clean up the mysql install."
+echo "My recommended answers:"
+echo " -  For the first question, enter your new mysql root password"
+echo " -  For the next 2 questions just press <enter>"
+echo " -  For the next 4 questions press y <enter>"  
+echo "When ready, press enter to continue."
+read crap
+
+sudo mysql_secure_installation
+echo " "
+echo "-----------------------------------------------------"
+echo " "
+echo "Your utility database server (mysql) is installed and running. "
+echo "TODO:  Validation steps."
+echo " "
+echo "Once that all works, TODO (php)."
+echo " "
+
