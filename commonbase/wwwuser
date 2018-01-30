@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#############################
+#                           
+# Establish dir as web content
+# making it visible/changeable
+# by anyone in the www group
+#
+#############################
+
+# check parameters ... there should be 1
+if [ "$#" -ne 1 ] || [ "$1" == "?" ] 
+then
+  echo " "
+  echo "WTF?!?  I was expecting you to name a user who should have read"
+  echo "and write access to web content directories.  Example:"
+  echo " "
+  echo "    commonbase/wwwuser tomcat"
+  echo " "
+  exit 1
+fi
+
+username=$1
+
+sudo groupadd -f www
+sudo usermod -a -G www $username
+

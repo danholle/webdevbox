@@ -39,6 +39,8 @@ echo "Installing mysql.  You'll be asked for a database root"
 echo "password... think of a good one.  We'll be using it later"
 echo "in the install process."
 echo " "
+echo "Press <enter> to continue."
+read crap
 sudo apt-get install mysql-server -y
 sudo systemctl start mysql
 
@@ -57,7 +59,12 @@ echo " "
 echo "-----------------------------------------------------"
 echo " "
 echo "Your utility database server (mysql) is installed and running. "
-echo "TODO:  Validation steps."
+echo "As a cursory check, let's try it:"
+echo " "
+echo "    mysql -u root -p"
+echo "     ... enter your mysql root password when asked ..."
+echo "    select 1+1;"
+echo "    \q"
 echo " "
 echo "Once that all works, TODO (php)."
 echo " "

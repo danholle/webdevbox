@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#############################
+#                           
+# Set up an Open Social site powered by Drupal
+#
+#############################
+
+echo " "
+
+# check parameters ... there should be 1
+if [ "$#" -ne 1 ] || [ "$1" == "?" ]
+then
+  echo "WTF?!?  I was looking for the domain name for your social site."
+  echo "Maybe something like "
+  echo " "
+  echo "    php/opensocial blahblah.com"
+  echo " "
+  exit 1
+fi
+
+domain=$1
+
+# Check to see if it's already installed
+if [ -d "/var/www/$domain" ]
+then
+  echo "It looks like there is already content at /var/www/$domain."
+  echo "Press enter to blow it away, ctrl-c to cancel."
+  read crap
+  sudo rm -rf "/var/www/$domain"
+fi
+
+echo "Creating web directory..."
+sudo mkdir -p /var/www/$domain
+
+echo "Creating Open Social site..."
+composer create-project goalgorilla/social_template:dev-master /var/www/$domain --no-interaction
+
+sudo mkdir "/var/www/$domain/logs"
+sudo cp php/opensocialconf "/etc/nginx/sites-available/$domain"
+sudo ln -sf "/etc/nginx/sites-available/$domain" /etc/nginx/sites-enabled/
+sitedef=/var/www/$domain/html/sites/default
+sudo cp $sitedef/default.settings.php $sitedef/settings.php
+sudo cp $sitedef/default.services.yml $sitedef/services.yml
+sudo mkdir $sitedef/files
+sudo chown -R root:www "/var/www/$domain"
+sudo chmod -R 777 "/var/www/$domain"
+sudo systemctl reload nginx
+
+echo " "
+echo "Your site at $domain is ready for you to use (first steps will"
+echo "be setup).  "
+echo "To verify, here are some steps:  TODO"
+echo " "
+echo "Once that all works, TODO."
+echo " "
+

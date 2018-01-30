@@ -10,17 +10,26 @@ echo " "
 if [ "$#" -eq 0 ]
 then
   echo "Blowing away mysql."
-  sudo service mysql stop
+  echo " "
   sudo systemctl stop mysql
   sudo killall -KILL mysql mysqld_safe mysqld
-  sudo apt-get --purge remove "mysql*" -y
-  sudo apt-get --yes autoremove --purge
+  
+  sudo apt-get remove dbconfig-mysql dbconfig-common -y
+  sudo rm -rf /etc/dbconfig-common
+  
+  sudo apt-get --purge remove mysql-server mysql-client mysql-common -y
+  sudo apt-get autoremove -y
   sudo apt-get autoclean
+  
   sudo deluser --remove-home mysql
-  sudo delgroup mysql
-  #sudo rm -rf /etc/apparmor.d/abstractions/mysql /etc/apparmor.d/cache/usr.sbin.mysqld 
-  sudo rm -rf /etc/mysql /var/lib/mysql /var/log/mysql* /var/log/upstart/mysql.log* /var/run/mysqld
-  sudo updatedb
+  
+  sudo rm -rf /var/lib/mysql
+  sudo rm -rf /var/log/mysql
+  sudo rm -rf /var/run/mysql
+  sudo rm -rf /etc/mysql
+  sudo rm -rf ~/.mysql
+  
+  echo " "
   echo "mysql has been purged."
   echo " "
 else

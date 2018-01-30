@@ -8,20 +8,6 @@
 
 echo " "
 
-# Check to see if it's already installed
-if [ -f /run/php/* ]
-then
-  echo "It looks like php is already installed.  If you want to remove"
-  echo "what's there and clean re-install, use these commands:"
-  echo " "
-  echo "    php/purge"
-  echo "    php/install" 
-  echo " "
-  exit 1
-fi
-
-# check prerequisites?  ... ok, but there are none.
-
 # check parameters ... there should be 0
 if [ "$#" -gt 0 ]
 then
@@ -32,29 +18,39 @@ then
   exit 1
 fi
 
+echo "Installing PHP 7.0 stuff."
 echo " "
-echo "Installing PHP stuff."
-echo " "
-sudo apt-get install php7.0-fpm php7.0-cli php7.0-gd php7.0-mysql php7.0-xml -y
+sudo apt-get install php7.0-fpm php7.0-cli php7.0-gd php7.0-mysql php7.0-xml php7.0-curl php7.0-mbstring -y
 sudo apt-get install phpmyadmin -y
 
-# install composer, drush TODO
-# fix /etc/php/7.0/fpm TODO 
-# fix .php in nginx TODO
-# fix index.php TODO
+# Fix pathinfo... no idea why
+sudo sed -i "s/fix_pathinfo=0/fix_pathinfo=1/g" /etc/php/7.0/fpm/php.ini
+sudo sed -i "s/;fix_pathinfo=/fix_pathinfo=/g"  /etc/php/7.0/fpm/php.ini
 
+# Making php launch at startup... and launching it now
 sudo systemctl enable php7.0-fpm
 sudo systemctl start php7.0-fpm
-sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-composer global require drush/drush
 cp php/hello.php /var/www/html/hello.php
+
+# Install composer globally
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+rm composer-setup.php
 
 echo " "
 echo "-----------------------------------------------------"
 echo " "
 echo "PHP is installed and running."
-echo "TODO:  Validation steps."
+echo "As a cursory check, here are two:  point your browser at "
 echo " "
-echo "Once that all works, TODO (php)."
+echo "    http://localhost/hello.php"
+echo " "
+echo "and you should get a Hello World page from PHP.  Then from the"
+echo "command line, say "
+echo " "
+echo "    composer"
+echo " "
+echo "and you should get some ASCII art that throws you back to a"
+echo "recent century."
 echo " "
 

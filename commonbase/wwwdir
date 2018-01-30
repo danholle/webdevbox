@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#############################
+#                           
+# Establish dir as web content
+# making it visible/changeable
+# by anyone in the www group
+#
+#############################
+
+# check parameters ... there should be 1
+if [ "$#" -ne 1 ] || [ "$1" == "?" ] || [ ! -d "$1" ]
+then
+  echo " "
+  echo "WTF?!?  I was expecting you to name a directory that contains "
+  echo "web content, so that I can allow anyone in the www group to read"
+  echo "or write it.  Example: "
+  echo " "
+  echo "    commonbase/wwwdir /var/www"
+  echo " "
+  exit 1
+fi
+
+dirname=$1
+
+sudo groupadd -f www
+sudo usermod -a -G www $USER
+sudo chown -R $USER:www $dirname
+sudo chmod -R g+rw $dirname
+
